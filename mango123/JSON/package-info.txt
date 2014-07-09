@@ -1,0 +1,4 @@
+/**
+ * <p>This package is a learning project for myself to write a JSON parser.
+ * It contains classes that would parse a JSON file, but should not be used for actual application.</p>
+ */
