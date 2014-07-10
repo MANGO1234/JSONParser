@@ -62,23 +62,24 @@ public class MakeSureJSONObjectWorks {
 		}
 	}
 	
-	public static String correctJSONString = "{\"int\": 1, \"long\": 123456789012, " + 
+	public static String correctJSONString = "{\"int\": 1, \"long\": 123456789012, " +
 	"\"bigInt\": 1234567890123456789012345, \"double\": 1.0e20, \"bigDecimal\": 1.234e1234," +
 	"\"str\": \"abc\\u023D\", \"bool1\": true, \"bool2\": false, \"null\": null, " +
-	"\"object\": {\"a\":1}, \"array\": [1], \"escape\": \"\\b\\t\\n\\f\\r\\\"\\\\\" }";
+	"\"object\": {\"a\":1}, \"array\": [1, 2, 3], \"escape\": \"\\b\\t\\n\\f\\r\\\"\\\\\" }";
 	@Test
 	public void testJSONIsParsedCorrectlyIntoAJSONObjectWithCorrectTypes() throws Exception {
+		JSONObject ob = JSONObject.parse(new JSONTokener(new StringReader(correctJSONString)));
+		assertEquals("Integer", 1, ob.getInt("int").intValue());
+		assertEquals("Long", 123456789012l, ob.getLong("long").longValue());
+		assertEquals("BigInt", new BigInteger("1234567890123456789012345"), ob.getBigInt("bigInt"));
+		assertEquals("Double", Double.valueOf("1.0e20"), ob.getDouble("double"));
+		assertEquals("BigDecimal", new BigDecimal("1.234e1234"), ob.getDecimal("bigDecimal"));
+		assertEquals("String", "abc\u023D", ob.getString("str"));
+		assertEquals("true", Boolean.TRUE, ob.getBoolean("bool1"));
+		assertEquals("false", Boolean.FALSE, ob.getBoolean("bool2"));
+		assertEquals("escape", "\b\t\n\f\r\"\\", ob.getString("escape"));
+
 		try {
-			JSONObject ob = JSONObject.parse(new JSONTokener(new StringReader(correctJSONString)));
-			assertEquals("Integer", 1, ob.getInt("int").intValue());
-			assertEquals("Long", 123456789012l, ob.getLong("long").longValue());
-			assertEquals("BigInt", new BigInteger("1234567890123456789012345"), ob.getBigInt("bigInt"));
-			assertEquals("Double", Double.valueOf("1.0e20"), ob.getDouble("double"));
-			assertEquals("BigDecimal", ob.getDecimal("bigDecimal"), new BigDecimal("1.234e1234"));
-			assertEquals("String", ob.getStr("str"), "abc\u023D");
-			assertEquals("true", Boolean.TRUE, ob.getBoolean("bool1"));
-			assertEquals("false", Boolean.FALSE, ob.getBoolean("bool2"));
-			assertEquals("escape", "\b\t\n\f\r\"\\", ob.getStr("escape"));
 			assertNull("null", ob.get("null"));
 			Object o = ob.getArray("array");
 			if (!(o instanceof JSONArray)) {

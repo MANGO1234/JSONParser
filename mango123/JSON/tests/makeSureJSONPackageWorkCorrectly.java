@@ -9,7 +9,7 @@ import mango123.JSON.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-public class makeSureJSONPackageWorkCorrectly {
+public class MakeSureJSONPackageWorkCorrectly {
 
 	public static String allTokens = "\"HELLO\" \"unicode\\u002F\\uAAD1\" 1 -1 1.2 -1.2 1e10 -1e10 1.2e10 -1.2e10 1.2e0 1e-10 true false null [ ] { } : ,";
 	public static String[] allTokensCheck = allTokens.split(" ");
@@ -34,9 +34,8 @@ public class makeSureJSONPackageWorkCorrectly {
 		}
 	}
 
-	//NOTE: cannot test solidus '/'
-	public static String[] correctEscape = "\"\\b\" \"\\f\" \"\\n\" \"\\r\" \"\\t\" \"\\\\\" \"\\\"\" \"\\u212F\"".split(" ");
-	public static String[] correctEscapeCompanion = "\"\b\" \"\f\" \"\n\" \"\r\" \"\t\" \"\\\" \"\"\" \"\u212F\"".split(" ");
+	public static String[] correctEscape = "\"\\/\\b\\t\" \"\\f\" \"\\n\" \"\\r\" \"\\t\" \"\\\\\" \"\\\"\" \"\\u212F\"".split(" ");
+	public static String[] correctEscapeCompanion = "\"/\b\t\" \"\f\" \"\n\" \"\r\" \"\t\" \"\\\" \"\"\" \"\u212F\"".split(" ");
 	@Test
 	public void testCorrectParsingOfEscapedSequence() {
 		try {
@@ -71,14 +70,14 @@ public class makeSureJSONPackageWorkCorrectly {
 	public void testJSONIsParsedCorrectlyIntoAJSONObjectWithCorrectTypes() {
 		try {
 			JSONObject ob = JSONObject.parse(new JSONTokener(new StringReader(correctJSONObject)));
-			Assert.assertEquals("Integer", 1, ob.getInt("int").intValue());
-			Assert.assertEquals("Long", 123456789012l, ob.getLong("long").longValue());
-			Assert.assertEquals("BigInt", new BigInteger("1234567890123456789012345"), ob.getBigInt("bigInt"));
-			Assert.assertEquals("Double", Double.parseDouble("1.0e20"), ob.getDouble("double"));
-			Assert.assertEquals("BigDecimal", ob.getDecimal("bigDecimal"), new BigDecimal("1.234e1234"));
-			Assert.assertEquals("String", ob.getStr("str"), "abc\u023D");
-			Assert.assertEquals("true", Boolean.TRUE, ob.getBoolean("bool1"));
-			Assert.assertEquals("false", Boolean.FALSE, ob.getBoolean("bool2"));
+			assertEquals("Integer", 1, ob.getInt("int").intValue());
+			assertEquals("Long", 123456789012l, ob.getLong("long").longValue());
+			assertEquals("BigInt", new BigInteger("1234567890123456789012345"), ob.getBigInt("bigInt"));
+			assertEquals("Double", (Double) Double.parseDouble("1.0e20"), ob.getDouble("double"));
+			assertEquals("BigDecimal", new BigDecimal("1.234e1234"), ob.getDecimal("bigDecimal"));
+			assertEquals("String", "abc\u023D", ob.getString("str"));
+			assertEquals("true", Boolean.TRUE, ob.getBoolean("bool1"));
+			assertEquals("false", Boolean.FALSE, ob.getBoolean("bool2"));
 		} catch(Exception e) {
 			fail(e.getMessage());
 		}

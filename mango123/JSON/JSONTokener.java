@@ -1,8 +1,7 @@
 package mango123.JSON;
 import java.io.*;
 
-//TODO: Write tryReadString() to include unicode
-public class JSONTokener {
+public class JSONTokener implements AutoCloseable {
 	/**
 	 * JSON symbols. They are returned in .nextToken()
 	 */
@@ -15,10 +14,7 @@ public class JSONTokener {
 	public static String TRUE = "true";
 	public static String FALSE = "false";
 	public static String NULL = "null";
-	
-	/**
-	 * Input of characters
-	 */
+
 	private final Reader reader;
 
 	/**
@@ -57,10 +53,10 @@ public class JSONTokener {
 	 * number of lines read so far, use in .newSyntaxError()
 	 */
 	private int numOfLines = 1;
+	private int charOnLine = -1;
 
 	/**
 	 * Used when a character is read but it may not be used.
-	 * .tryReadNumber() is the only method that needs it so far.
 	 */
 	private Character pushback;
 
@@ -69,15 +65,12 @@ public class JSONTokener {
 	 * <p>The message you passed into this method will be prepended with "JSON Syntax Error on 
 	 * Line(insert line number): "</p>
 	 * <p>e.g. "'}' is missing at the end -&gt; Syntax Error on Line 6: '}' is missing at the end"</p>
-	 * @param message a string containing the message for the syntax error
-	 * @throws JSONException
 	 */
 	public JSONException newSyntaxError(String message) {
-		return new JSONException("Syntax error (line " + numOfLines + "): " + message);
+		return new JSONException("Syntax error (line " + numOfLines + " char " + charOnLine + "): " + message);
 	}
 	
-	//TODO: javadoc better
-	//TODO: put reader.close()
+	//TODO: javadoc
 	/**
 	 * <p>Returns the next JSON token in a string from the input.</p>
 	 * <p>If there are no more tokens to be read, <code>null</code> would be returned.</p>
@@ -89,8 +82,8 @@ public class JSONTokener {
 	 * <ul>
 	 * <li>Variable: a string or number</li>
 	 * <li>Constant: <code>true</code>, <code>false</code>, <code>{</code>, etc. see all the
-	 * String constants provided by this class. They will be returned so you can use == to
-	 * get the type of tokens instead of String.equal().</li>
+	 * String constants provided by this class. They will be returned so == can be used for comparison
+	 * instead of String.equal().</li>
 	 * </ul></p>
 	 * <p>Examples of string returned for each type of tokens:</p>
 	 * @return a String containing the next token, or null if there are no more tokens
@@ -136,6 +129,14 @@ public class JSONTokener {
 	}
 
 	/**
+	 * Closes the tokener.
+	 * @throws IOException
+	 */
+	public void close() throws IOException {
+		reader.close();
+	}
+
+	/**
 	 * Gets the next character in the input.
 	 * EOF will be set to true if there are no more characters.
 	 */
@@ -143,6 +144,7 @@ public class JSONTokener {
 		try {
 			int ch = reader.read();
 			if (ch == -1) EOF = true;
+			else          charOnLine++;
 			return (char) ch;
 		}
 		catch(IOException e) {
@@ -157,9 +159,10 @@ public class JSONTokener {
 		//get char from pushback if there it exists, else read it
 		char ch;
 		if (pushback != null) {
-			ch = pushback.charValue();
+			ch = pushback;
 			pushback = null;
-		} else {
+		}
+		else {
 			ch = next();	
 		}
 
@@ -167,9 +170,10 @@ public class JSONTokener {
 		while (true) {
 			if (isNewLine(ch)) {
 				numOfLines++;
-			} else if (Character.isWhitespace(ch)) {
-				//don't do anything for whitespace
-			} else {
+				charOnLine = -1;
+			}
+			else if (Character.isWhitespace(ch)) {} //don't do anything for whitespace
+			else {
 				return ch; //when EOF or valid character
 			}
 			ch = next();
@@ -187,11 +191,14 @@ public class JSONTokener {
 		while (!EOF) {
 			if (ch == '\\') {
 				str.append(tryReadEscape());
-			} else if (ch == '"') {
+			}
+			else if (ch == '"') {
 				return str.append('"').toString();
-			} else if (Character.isISOControl(ch)) {
-				throw newSyntaxError("a JSON string cannot contain control character (e.g. tabs)");
-			} else {
+			}
+			else if (Character.isISOControl(ch)) {
+				throw newSyntaxError("a JSON string cannot contain control character (e.g. \\t): " + ch);
+			}
+			else {
 				str.append(ch);
 			}
 			ch = next();
@@ -206,10 +213,10 @@ public class JSONTokener {
 	 */
 	private char tryReadEscape() throws JSONException {
 		char ch = next();
-		switch(ch) {
+		switch (ch) {
 		case '"':
 		case '\\':
-		case '/':
+			case '/':
 			return ch;
 		case 'b':
 			return '\b';
@@ -232,22 +239,23 @@ public class JSONTokener {
 				char c = str[i];
 				if (isASCIIDigit(c)) {
 					num += (c - 48) << (12 - i * 4);
-				} else if (c >= 'A' && c <= 'F') {
+				}
+				else if (c >= 'A' && c <= 'F') {
 					num += (c - 55) << (12 - i * 4);
-				} else {
+				}
+				else {
 					throw newSyntaxError("invalid unicode character '\\u" + new String(str) + "'");
 				}
 			}
 			return (char) num;
 		default:
 			throw newSyntaxError("invalid escape sequence \\" + ch +
-			      ", valid escape squence are \\b\\f\\n\\r\\t\\/\\\"\\\\");
+			      ", valid escape sequences are \\b\\f\\n\\r\\t\\/\\\"\\\\");
 		}
 	}
 	
 	/**
 	 * Try read a number and will throw JSONException if a syntax error is found.
-	 * It's complicated because I'm trying to follow JSON standard and doing manual parsing.
 	 */
 	private String tryReadNumber(char ch) throws JSONException {
 		StringBuilder str = new StringBuilder().append(ch);
@@ -268,7 +276,8 @@ public class JSONTokener {
 				str.append(ch);
 				ch = next();
 			}
-		} else {
+		}
+		else {
 			ch = next();
 		}
 
@@ -313,7 +322,7 @@ public class JSONTokener {
 		}
 
 		//push back the extra character
-		pushback = Character.valueOf(ch);
+		pushback = ch;
 		return str.toString();
 	}
 
@@ -332,7 +341,7 @@ public class JSONTokener {
 		case ']':
 			return RIGHT_SQUARE;
 		}
-		throw newSyntaxError("Unrecoginzed symbol starting with '" + ch + "'");
+		throw newSyntaxError("Unrecognized symbol starting with '" + ch + "'");
 	}
 	
 	/**
@@ -342,7 +351,7 @@ public class JSONTokener {
 		if (next() == 'r' && next() == 'u' && next() == 'e') {
 			return TRUE;
 		}
-		throw newSyntaxError("Unrecogized symbol starting with 't'");
+		throw newSyntaxError("Unrecognized symbol starting with 't'");
 	}
 
 	/**
@@ -352,7 +361,7 @@ public class JSONTokener {
 		if (next() == 'a' && next() == 'l' && next() == 's' && next() == 'e') {
 			return FALSE;
 		}
-		throw newSyntaxError("Unrecogized symbol starting with 'f'");
+		throw newSyntaxError("Unrecognized symbol starting with 'f'");
 	}
 
 	/**
@@ -362,7 +371,7 @@ public class JSONTokener {
 		if (next() == 'u' && next() == 'l' && next() == 'l') {
 			return NULL;
 		}
-		throw newSyntaxError("Unrecogized symbol starting with 'n'");
+		throw newSyntaxError("Unrecognized symbol starting with 'n'");
 	}
 
 
@@ -375,20 +384,62 @@ public class JSONTokener {
 			ch = next();
 			if (ch == '\n') {
 				return true;
-			} else {
-				pushback = Character.valueOf(ch);
 			}
-		} else if (ch == '\n' || ch == '\f' || ch == '\u000B'
-		        || ch == '\u0085' || ch == '\u2028' || ch == '\u2029') {}
+			else {
+				pushback = ch;
+			}
+		}
+		else if (ch == '\n' || ch == '\f' || ch == '\u000B'
+		        || ch == '\u0085' || ch == '\u2028' || ch == '\u2029') {
+			return  true;
+		}
 		return false;
 	}
 
 	/**
 	 * Check whether a character is digit in the ASCII range
-	 * @param ch a character
-	 * @return a boolean value on whether the character is an ASCII digit or not
 	 */
 	private boolean isASCIIDigit(char ch) {
 		return ch >= '0' && ch <= '9';
+	}
+
+	public static String escapeStr(String s) {
+		StringBuilder b = new StringBuilder();
+		int l = s.length();
+		for (int i = 0; i < l; i++) {
+			char ch = s.charAt(i);
+			switch (ch) {
+				case '\b':
+					b.append("\\b");
+					break;
+				case '\f':
+					b.append("\\f");
+					break;
+				case '\t':
+					b.append("\\t");
+					break;
+				case '\n':
+					b.append("\\n");
+					break;
+				case '\r':
+					b.append("\\r");
+					break;
+				case '\\':
+					b.append("\\\\");
+					break;
+				case '\"':
+					b.append("\\\"");
+					break;
+				default:
+					if (Character.isISOControl(ch)) {
+						b.append("\\u00");
+						b.append(Integer.toHexString(ch));
+					}
+					else {
+						b.append(ch);
+					}
+			}
+		}
+		return b.toString();
 	}
 }

@@ -5,11 +5,17 @@ import java.math.BigInteger;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-//TODO: javadoc
+/**
+ * <p>This class represents a JSON object. It cannot be constructed directly. Instead, use the static
+ * {@code JSONObject.parse(JSONTokener)} or {@code JSONObject.newEmptyInstance()} to get an instance
+ * of JSONObject.</p>
+ * <p>e.g. a JSONTokener containing the input "{@code {"a": 1, "b": "HELLO", "c": [1, 2, 3]}" can be passed
+ * into {@code .parse()} to get an instance of JSONArray containing the above elements.</p>
+ * @author De Li
+ * @version 0.8
+ * @see JSONArray
+ */
 public final class JSONObject {
-	/**
-	 * this is the map representation of the JSON data
-	 */
 	Map<String, Object> map;
 	
 	/**
@@ -27,7 +33,7 @@ public final class JSONObject {
 	public static JSONObject newEmptyInstance() {
 		return new JSONObject(new LinkedHashMap<String, Object>());
 	}
-	
+
 	/**
 	 * Parses and constructs a <code>JSONObject</code> from a <code>JSONTokener</code>.
 	 * @param tokener the JSON input
@@ -84,7 +90,7 @@ public final class JSONObject {
 	 * @param key the string key
 	 * @return the <code>String</code> mapped by the key, or null if it cannot be found
 	 */
-	public String getStr(String key) {
+	public String getString(String key) {
 		Object v = map.get(key);
 		return (v instanceof String) ? (String) v : null;
 	}
@@ -183,7 +189,7 @@ public final class JSONObject {
 	/**
 	 * <p>Return <code>true</code> if the specified key does not exist or the value mapped by the
 	 * key is <code>null</null>.</p>
-	 * <p>Use {@link #hasKey()} to determine whether the key exists or not if you need it.</b>
+	 * <p>Use {@link #hasKey(String)} to determine whether the key exists or not if you need it.</b>
 	 * @param key the string key
 	 * @return <code>true</code> if the key does not exist or the value mapped by it is <code>null</code>
 	 */
@@ -321,7 +327,6 @@ public final class JSONObject {
 		return this;
 	}
 
-	//TODO: for strings, change to unicode representation if a char bigger than \u00ff
 	/**
 	 * <p>Returns the string representation of the JSONObject in JSON.</p>
 	 * <p>The format will be the most compact (no whitespaces) and strictly conform to JSON.</p>
@@ -337,8 +342,11 @@ public final class JSONObject {
 			str.append('"').append(m.getKey()).append('"').append(':');
 			
 			if (m.getValue() instanceof String) {
-				str.append('"').append(m.getValue()).append('"');
-			} else {
+				str.append('"')
+					.append(JSONTokener.escapeStr((String) m.getValue()))
+					.append('"');
+			}
+			else {
 				str.append(m.getValue());
 			}
 

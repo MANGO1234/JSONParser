@@ -8,24 +8,19 @@ import java.util.List;
 
 /**
  * <p>This class represents a JSON array. It cannot be constructed directly. Instead, use the static
- * {@code JSONObject.parse(JSONTokener)} or {@code JSONArray.newEmptyInstance()} to get an instance
+ * {@code JSONArray.parse(JSONTokener)} or {@code JSONArray.newEmptyInstance()} to get an instance
  * of JSONArray.</p>
- * <p>e.g. a JSONTokener containing the input "{@code [1, true, "d", [1], {"a": 1}]}" can be passed
+ * <p>e.g. a JSONTokener containing the input "{@code [1, true, "d", [1], {"a": 1}]" can be passed
  * into {@code .parse()} to get an instance of JSONArray containing the above elements.</p>
  * @author De Li
  * @version 0.8
  * @see JSONObject
  */
-//TODO: remove all the method chaining
-//TODO: useBigDecimalAlways()
 public class JSONArray {
-	/**
-	 * Holds the array elements
-	 */
 	private List<Object> list;
 	
 	/**
-	 * Prevent direct instantiation. User muse use .parse() and .newEmptyInstance()
+	 * Prevent direct instantiation. Must use .parse() and .newEmptyInstance()
 	 * Package-access to allow JSONParse to access this
 	 */
 	JSONArray(List<Object> list) {
@@ -39,7 +34,7 @@ public class JSONArray {
 	public static JSONArray newEmptyInstance() {
 		return new JSONArray(new ArrayList<Object>());
 	}
-	
+
 	/**
 	 * Parses and constructs a <code>JSONArray</code> from a <code>JSONTokener</code>.
 	 * @param tokener the JSON input
@@ -77,8 +72,8 @@ public class JSONArray {
 	public int size() {
 		return list.size();
 	}
-	
-	
+
+
 	/**
 	 * Returns <code>true</code> if this array contains no elements.
 	 * @return <code>true</code> if this array contains no elements
@@ -100,11 +95,23 @@ public class JSONArray {
 	}
 
 	/**
+	 * <p>Returns the <code>String</code> at the specified index in the array, or <code>null</code>
+	 * if the element is <code>null</code>.</p>
+	 * @param index the array index
+	 * @return the <code>String</code> at the specified index, or null if it's not a String
+	 * @throw ArrayIndexOutOfBoundsException if the index is out of range (<code>index < 0 ||
+	 *        index >= size()</code>)
+	 */
+	public Object getString(int index) {
+		Object ob = list.get(index);
+		return (ob instanceof String) ? (String) ob : null;
+	}
+
+	/**
 	 * <p>Returns the <code>Integer</code> at the specified index in the array, or <code>null</code>
 	 * if the element is not an<code>Integer</code>.</p>
 	 * @param index the array index
-	 * @return the <code>Integer</code> at the specified index, or null a <code>Long</code> cannot
-	 *         be found
+	 * @return the <code>Integer</code> at the specified index, or null if it's not an Integer
 	 * @throw ArrayIndexOutOfBoundsException if the index is out of range (<code>index < 0 ||
 	 *        index >= size()</code>)
 	 */
@@ -117,8 +124,7 @@ public class JSONArray {
 	 * <p>Returns the <code>Long</code> at the specified index in the array, or <code>null</code>
 	 * if the element is not an<code>Long</code>.</p>
 	 * @param index the array index
-	 * @return the <code>Long</code> at the specified index, or null a <code>Long</code> cannot
-	 *         be found
+	 * @return the <code>Long</code> at the specified index, or null if it's not a Long
 	 * @throw ArrayIndexOutOfBoundsException if the index is out of range (<code>index < 0 ||
 	 *        index >= size()</code>)
 	 */
@@ -131,8 +137,7 @@ public class JSONArray {
 	 * <p>Returns the <code>BigInteger</code> at the specified index in the array, or <code>null</code>
 	 * if the element is not an<code>BigIntegr</code>.</p>
 	 * @param index the array index
-	 * @return the <code>BigInteger</code> at the specified index, or null a <code>BigInteger</code>
-	 *         cannot be found
+	 * @return the <code>BigInteger</code> at the specified index, or null if it's not a BigInteger
 	 * @throw ArrayIndexOutOfBoundsException if the index is out of range (<code>index < 0 ||
 	 *        index >= size()</code>)
 	 */
@@ -145,8 +150,7 @@ public class JSONArray {
 	 * <p>Returns the <code>Double</code> at the specified index in the array, or <code>null</code>
 	 * if the element is not an<code>Double</code>.</p>
 	 * @param index the array index
-	 * @return the <code>Double</code> at the specified index, or null a <code>Double</code>
-	 *         cannot be found
+	 * @return the <code>Double</code> at the specified index, or null if it's not a Double
 	 * @throw ArrayIndexOutOfBoundsException if the index is out of range (<code>index < 0 ||
 	 *        index >= size()</code>)
 	 */
@@ -159,8 +163,7 @@ public class JSONArray {
 	 * <p>Returns the <code>BigDecimal</code> at the specified index in the array, or <code>null</code>
 	 * if the element is not an<code>BigDecimal</code>.</p>
 	 * @param index the array index
-	 * @return the <code>BigDecimal</code> at the specified index, or null a <code>BigDecimal</code>
-	 *         cannot be found
+	 * @return the <code>BigDecimal</code> at the specified index, or null if it's not a BigDecimal
 	 * @throw ArrayIndexOutOfBoundsException if the index is out of range (<code>index < 0 ||
 	 *        index >= size()</code>)
 	 */
@@ -173,8 +176,7 @@ public class JSONArray {
 	 * <p>Returns the <code>Boolean</code> at the specified index in the array, or <code>null</code>
 	 * if the element is not an<code>Boolean</code>.</p>
 	 * @param index the array index
-	 * @return the <code>Boolean</code> at the specified index, or null a <code>Boolean</code>
-	 *         cannot be found
+	 * @return the <code>Boolean</code> at the specified index, or null it's not a boolean
 	 * @throw ArrayIndexOutOfBoundsException if the index is out of range (<code>index < 0 ||
 	 *        index >= size()</code>)
 	 */
@@ -187,8 +189,7 @@ public class JSONArray {
 	 * <p>Returns the <code>JSONArray</code> at the specified index in the array, or <code>null</code>
 	 * if the element is not an<code>JSONArray</code>.</p>
 	 * @param index the array index
-	 * @return the <code>JSONArray</code> at the specified index, or null a <code>JSONArray</code>
-	 *         cannot be found
+	 * @return the <code>JSONArray</code> at the specified index, or null  if it's not a JSONArray
 	 * @throw ArrayIndexOutOfBoundsException if the index is out of range (<code>index < 0 ||
 	 *        index >= size()</code>)
 	 */
@@ -201,8 +202,7 @@ public class JSONArray {
 	 * <p>Returns the <code>JSONObject</code> at the specified index in the array, or <code>null</code>
 	 * if the element is not an<code>JSONObject</code>.</p>
 	 * @param index the array index
-	 * @return the <code>JSONObject</code> at the specified index, or null a <code>JSONObject</code>
-	 *         cannot be found
+	 * @return the <code>JSONObject</code> at the specified index, or null if it's not a JSONObject
 	 * @throw ArrayIndexOutOfBoundsException if the index is out of range (<code>index < 0 ||
 	 *        index >= size()</code>)
 	 */
@@ -276,37 +276,27 @@ public class JSONArray {
 	
 	/**
 	 * <p>Sets the element at the specified index to the specified <code>BigInteger</code>.</p>
-	 * <p>This method only accepts an instance of BigInteger and not its subclasses as the value. It
-	 * will throw an IllegalArgumentException if you try to pass an instance of BigInteger's subclass
-	 * as value.</p>
 	 * @param index the array index
 	 * @param value the <code>BigInteger</code> to be set
 	 * @return a reference to this object
 	 * @throw ArrayIndexOutOfBoundsException if the index is out of range (<code>index < 0 ||
 	 *        index >= size()</code>)
-	 * @throw IllegalArgumentException if an instance of a subclass of BigInteger is passed as the value
 	 */
 	public JSONArray set(int index, BigInteger value) {
-		if (value.getClass() == BigInteger.class) list.set(index, value);
-		else throw new IllegalArgumentException(".put() does not accept a subclass of BigInteger");
+		list.set(index, value);
 		return this;
 	}
 	
 	/**
 	 * <p>Sets the element at the specified index to the specified <code>BigDecimal</code>.</p>
-	 * <p>This method only accepts an instance of BigDecimal and not its subclasses as the value. It
-	 * will throw an IllegalArgumentException if you try to pass an instance of BigDecimal's subclass
-	 * as the value.</p>
 	 * @param index the array index
 	 * @param value the <code>BigDecimal</code> to be set
 	 * @return a reference to this object
 	 * @throw ArrayIndexOutOfBoundsException if the index is out of range (<code>index < 0 ||
 	 *        index >= size()</code>)
-	 * @throw IllegalArgumentException if an instance of a subclass of BigDecimal is passed as the value
 	 */
 	public JSONArray set(int index, BigDecimal value) {
-		if (value.getClass() == BigDecimal.class) list.set(index, value);
-		else throw new IllegalArgumentException(".put() does not accept a subclass of BigDecimal");
+		list.set(index, value);
 		return this;
 	}
 	
@@ -450,7 +440,7 @@ public class JSONArray {
 		list.add(index, value);
 		return this;
 	}
-	
+
 	/**
 	 * <p>Inserts the specified <code>Boolean</code> at the specified index.</p>
 	 * @param index the array index
@@ -503,7 +493,7 @@ public class JSONArray {
 	}
 
 	/**
-	 * <p>Removes all of the elements from this list.</p>
+	 * <p>Removes all elements from this list.</p>
 	 * @return a reference to this object
 	 */
 	public JSONArray clear() {
@@ -536,9 +526,8 @@ public class JSONArray {
 	}
 
 	/**
-	 * <p>Returns an array containing all of the elements in this JSONArray in proper sequence
-	 * (from first to last element).</p>
-	 * @return returns an array containing all of the elements in this JSONArray in proper sequence
+	 * <p>Returns an array containing all of the elements in this JSONArray.</p>
+	 * @return an array verson of JSONArray
 	 */
 	public Object[] toArray() {
 		return list.toArray();
@@ -557,8 +546,11 @@ public class JSONArray {
 		int size = list.size(), i = 0;
 		for (Object ob : list) {
 			if (ob instanceof String) {
-				str.append('"').append(ob).append('"');
-			} else {
+				str.append('"')
+						.append(JSONTokener.escapeStr((String) ob))
+						.append('"');
+			}
+			else {
 				str.append(ob);
 			}
 

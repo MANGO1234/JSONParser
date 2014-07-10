@@ -70,25 +70,24 @@ public class MakeSureJSONArrayWorks {
 			//IGNORE
 		}
 	}
-	
+
 	public static String correctJSONString = "[1, 123456789012, 1234567890123456789012345," +
-	"1.0e20, 1.234e1234, \"abc\\u023D\", true, false, null, {\"a\":1}, [1], " + 
-	"\"\\b\\t\\n\\f\\r\\\"\\\\\"]";
+			"1.0e20, 1.234e1234, \"abc\\u023D\", true, false, null, {\"a\":1}, [1], \"\\b\\t\\n\\f\\r\\\"\\\\\"]";
 	@Test
 	public void testJSONIsParsedCorrectlyIntoAJSONObjectWithCorrectTypes() throws Exception {
-		try {
-			JSONArray arr = JSONArray.parse(new JSONTokener(new StringReader(correctJSONString)));
-			assertEquals("Integer", 1, arr.getInt(0).intValue());
-			assertEquals("Long", 123456789012l, arr.getLong(1).longValue());
-			assertEquals("BigInt", new BigInteger("1234567890123456789012345"), arr.getBigInt(2));
-			assertEquals("Double", Double.valueOf("1.0e20"), arr.getDouble(3));
-			assertEquals("BigDecimal", new BigDecimal("1.234e1234"), arr.getDecimal(4));
-			assertEquals("String", "abc\u023D", arr.get(5));
-			assertEquals("true", arr.get(6), Boolean.TRUE);
-			assertEquals("false", arr.get(7), Boolean.FALSE);
-			assertNull("null", arr.get(8));
-			assertEquals("escape", arr.get(11), "\b\t\n\f\r\"\\");
+		JSONArray arr = JSONArray.parse(new JSONTokener(new StringReader(correctJSONString)));
+		assertEquals("Integer", 1, arr.getInt(0).intValue());
+		assertEquals("Long", 123456789012l, arr.getLong(1).longValue());
+		assertEquals("BigInt", new BigInteger("1234567890123456789012345"), arr.getBigInt(2));
+		assertEquals("Double", Double.valueOf("1.0e20"), arr.getDouble(3));
+		assertEquals("BigDecimal", new BigDecimal("1.234e1234"), arr.getDecimal(4));
+		assertEquals("String", "abc\u023D", arr.get(5));
+		assertEquals("true", Boolean.TRUE, arr.get(6));
+		assertEquals("false", Boolean.FALSE, arr.get(7));
+		assertNull("null", arr.get(8));
+		assertEquals("escape", "\b\t\n\f\r\"\\", arr.get(11));
 
+		try {
 			Object o = arr.getArray(10);
 			if (!(o instanceof JSONArray)) {
 				fail("JSONArray");
@@ -97,7 +96,8 @@ public class MakeSureJSONArrayWorks {
 			if (!(o instanceof JSONObject)){
 				fail("JSONObject");
 			}
-		} catch(Exception e) {
+		}
+		catch (Exception e) {
 			throw e;
 		}
 	}

@@ -19,7 +19,8 @@ public class MakeSureJSONTokenerWorks {
 				if (token.startsWith("\"unicode")) {
 					assertEquals("\"unicode\u002F\uAAD1\"", token);
 					i++;
-				} else {
+				}
+				else {
 					assertEquals(allTokensCheck[i++], token);
 				}
 			}
@@ -29,9 +30,8 @@ public class MakeSureJSONTokenerWorks {
 		}
 	}
 
-	//NOTE: cannot test solidus '/'
-	public static String[] correctEscape = "\"\\b\" \"\\f\" \"\\n\" \"\\r\" \"\\t\" \"\\\\\" \"\\\"\" \"\\u212F\"".split(" ");
-	public static String[] correctEscapeCompanion = "\"\b\" \"\f\" \"\n\" \"\r\" \"\t\" \"\\\" \"\"\" \"\u212F\"".split(" ");
+	public static String[] correctEscape = "\"/\\/\\b\" \"\\f\" \"\\n\" \"\\r\" \"\\t\" \"\\\\\" \"\\\"\" \"\\u212F\"".split(" ");
+	public static String[] correctEscapeCompanion = "\"//\b\" \"\f\" \"\n\" \"\r\" \"\t\" \"\\\" \"\"\" \"\u212F\"".split(" ");
 	@Test
 	public void testCorrectParsingOfEscapedSequence() {
 		try {
